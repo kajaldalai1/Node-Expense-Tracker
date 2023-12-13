@@ -47,9 +47,9 @@ server.post('/user', async (req, res) => {
     }
   });
 
-  server.get('/user',async(req,res)=>{
+  server.get('/user/login',async(req,res)=>{
     try{
-      const { email, password } = req.body;
+      const { email, password } = req.query;
       if(isstringinvalid(email) || isstringinvalid(password)){
           return res.status(400).json({message: 'EMail idor password is missing ', success: false})
       }
