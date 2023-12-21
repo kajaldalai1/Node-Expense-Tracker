@@ -20,9 +20,10 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">        
         <div class="container-fluid"> 
             <div class="container d-flex ">
-            <a class="navbar-brand fs-1" href="#">Expense Tracker</a>               
+            <a class="navbar-brand fs-1" href="/views/index.html">Expense Tracker</a>               
             <div class="collapse navbar-collapse justify-content-end" id="navbarTogglerDemo03">
-                <div class="d-flex">                    
+                <div class="d-flex">
+                     <button class="btn btn-outline-success me-4" id="premiumbtn">Buy Premium</button>                       
                      <a href="/login.html"><button class="btn btn-outline-light mx-3">Log In</button></a> 
                      <a href="/signup.html"><button class="btn btn-outline-warning me-4">Sign Up</button>  </a>                   
                 </div>           
@@ -35,7 +36,7 @@
             <div class="container">       
                 <div class="row">
                     <div class="col-6 row1">
-                        <img src="./Expense-PNG-Pic.png" width="100%">
+                        <img src="./Expense-PNG-Image.png" width="100%">
                     </div>
                     <div class="col-6 d-flex align-items-center">
                         <div class="px-4">
@@ -48,5 +49,34 @@
         </div>                       
         </div>
     </section>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+
+    <script>
+document.getElementById('premiumbtn').onclick = async function (e) {
+        const token = localStorage.getItem('token')
+        const response = await axios.get('http://localhost:2000/purchase/premiummembership', { headers: { "Authorization": token } })
+        console.log(response)
+        var options = { // Corrected variable name from "option" to "options"
+            "key": response.data.order_id,
+            "order_id": response.data.order_id,
+            "handler": async function (response) {
+                await axios.post('http://localhost:2000/purchase/updatetransactionstatus', {
+                    order_id: options.order_id, // Corrected variable name from "options" to "options"
+                    payment_id: response.razorpay_payment_id,
+                }, { headers: { "Authorization": token } })
+
+                alert('You are a Premium user now')
+            },
+        };
+        const rzp1 = new Razorpay(options); // Corrected variable name from "rzpn1" to "rzp1"
+        rzp1.open();
+        e.preventDefault();
+        rzp1.on('paymentfailed', function (response) { // Corrected variable name from "rzpn1" to "rzp1"
+            console.log(response)
+            alert('something went wrong')
+        });
+    }
+    </script>
 </body>
 </html>
